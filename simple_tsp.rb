@@ -1,6 +1,7 @@
 points = []
 current_generations = []
 next_generations = []
+n = 10
 
 def set_points(points)
   points.push({x: 4, y: 5})
@@ -36,6 +37,23 @@ def calc_total_distance(points, route)
   total_distance
 end
 
+def create_first_generation(points, n)
+  current_generations = []
+  route = generate_route_array(points)
+  n.times do |i|
+    gene = route.shuffle
+    solution = calc_total_distance(points, gene)
+    current_generations.push({solution: solution, gene: gene})
+  end
+  current_generations
+end
+
+def create_next_generation(n)
+  # 1. ルーレット選択
+  # 2. 一様公叉
+  # 3. 突然変異
+end
+
 set_points(points)
 route = generate_route_array(points)
-puts calc_total_distance(points, route)
+puts create_first_generation(points, n)
