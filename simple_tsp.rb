@@ -2,6 +2,7 @@ points = []
 current_generations = []
 next_generations = []
 n = 10
+mutation_probability = 0.005 # 0.5%
 
 def set_points(points)
   points.push({x: 4, y: 5})
@@ -48,12 +49,53 @@ def create_first_generation(points, n)
   current_generations
 end
 
-def create_next_generation(n)
-  # 1. ルーレット選択
-  # 2. 一様公叉
-  # 3. 突然変異
+def create_next_generation(current_generations, n, mutation_probability, points)
+  next_generations = []
+  denominator = calc_denominator(current_generations)
+  crossing_genes = choose_crossing_genes(current_generations[0][:gene].size)
+
+  current_generations.each do |current_generation|
+    roulette_probability_scaled = current_generation[:solution] / denominator.to_f * 10000
+    mutation_probability_scaled = mutation_probability * 10000
+
+    random = Random.new.rand * 10000  # consider to 0.01%
+
+    if random < roulette_probability_scaled
+      next_generations.push(current_generation)
+    elsif roulette_probability_scaled <= random && random < roulette_probability_scaled + mutation_probability_scaled
+      gene = generate_route_array(points).shuffle
+      solution = calc_total_distance(points, gene)
+      next_generations.push({solution: solution, gene: gene})
+    else
+      # crossing
+    end
+  end
+end
+
+def choose_crossing_genes(route_size)
+  random = Random.new
+
+  a = random.rand(route_size - 1).to_i
+  b = random.rand(route_size - 1).to_i
+
+  while a == b
+    b = random.rand(route_size - 1)
+  end
+  [a, b]
+end
+
+def crossing_genes
+end
+
+def calc_denominator(current_generations)
+  denominator = 0
+  current_generations.each do |current_generation|
+    denominator += current_generation[:solution]
+  end
+  denominator
 end
 
 set_points(points)
 route = generate_route_array(points)
-puts create_first_generation(points, n)
+current_generations = create_first_generation(points, n)
+puts create_next_generation(current_generations, n, mutation_probability, points)
