@@ -1,6 +1,7 @@
 points = []
 current_generations = []
-n = 100
+n = 300
+generation_number = 8000
 mutation_probability = 0.005 # 0.5%
 
 def set_points(points)
@@ -10,6 +11,11 @@ def set_points(points)
   points.push({x: 2, y: 1})
   points.push({x: 8, y: 9})
   points.push({x: 1, y: 3})
+  points.push({x: 14, y: 3})
+  points.push({x: 32, y: 11})
+  points.push({x: 19, y: 42})
+  points.push({x: 87, y: 12})
+  points.push({x: 28, y: 56})
 end
 
 def calc_squared_distance(p1, p2)
@@ -72,6 +78,7 @@ def create_next_generation(current_generations, n, mutation_probability, points)
       solution = calc_total_distance(points, gene)
       next_generations.push({solution: solution, gene: gene})
     else
+      #[FIXME]
       crossed_gene = crossing_genes(current_generation, crossing_genes_array)
       solution = calc_total_distance(points, crossed_gene)
       next_generations.push({solution: solution, gene: crossed_gene})
@@ -116,8 +123,14 @@ end
 set_points(points)
 route = generate_route_array(points)
 current_generations = create_first_generation(points, n)
-3.times do |i|
+generation_number.times do |i|
   current_generations = create_next_generation(current_generations, n, mutation_probability, points)
 end
 
-puts "Answer is #{current_generations[0][:solution]}"
+puts "最短距離:#{current_generations[0][:solution]}"
+# [FIXME]squared value
+route_output = ""
+current_generations[0][:gene].each do |gene|
+  route_output += "#{gene} -> "
+end
+puts "道順: #{route_output}"
