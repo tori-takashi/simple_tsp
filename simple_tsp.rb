@@ -1,7 +1,6 @@
 points = []
 current_generations = []
-next_generations = []
-n = 10
+n = 100
 mutation_probability = 0.005 # 0.5%
 
 def set_points(points)
@@ -52,13 +51,13 @@ end
 def create_next_generation(current_generations, n, mutation_probability, points)
   next_generations = []
   denominator = calc_denominator(current_generations)
-  crossing_genes = choose_crossing_genes(current_generations[0][:gene].size)
+  crossing_genes_array = choose_crossing_genes(current_generations[0][:gene].size)
 
   current_generations.each do |current_generation|
     roulette_probability_scaled = current_generation[:solution] / denominator.to_f * 10000
     mutation_probability_scaled = mutation_probability * 10000
 
-    random = Random.new.rand * 10000  # consider to 0.01%
+    random = Random.new.rand * 10000  # consider at 0.01%
 
     if random < roulette_probability_scaled
       next_generations.push(current_generation)
@@ -67,9 +66,12 @@ def create_next_generation(current_generations, n, mutation_probability, points)
       solution = calc_total_distance(points, gene)
       next_generations.push({solution: solution, gene: gene})
     else
-      # crossing
+      crossed_gene = crossing_genes(current_generation, crossing_genes_array)
+      solution = calc_total_distance(points, crossed_gene)
+      next_generations.push({solution: solution, gene: crossed_gene})
     end
   end
+  next_generations
 end
 
 def choose_crossing_genes(route_size)
@@ -84,7 +86,16 @@ def choose_crossing_genes(route_size)
   [a, b]
 end
 
-def crossing_genes
+def crossing_genes(current_generation, crossing_genes_array)
+  gene = current_generation[:gene]
+  t1 = gene[crossing_genes_array[0]]
+  t2 = gene[crossing_genes_array[1]]
+
+  manipulated_gene = gene
+  manipulated_gene[crossing_genes_array[0]] = t2
+  manipulated_gene[crossing_genes_array[1]] = t1
+
+  manipulated_gene
 end
 
 def calc_denominator(current_generations)
@@ -98,4 +109,7 @@ end
 set_points(points)
 route = generate_route_array(points)
 current_generations = create_first_generation(points, n)
-puts create_next_generation(current_generations, n, mutation_probability, points)
+10000.times do |i|
+  puts current_generations
+  current_generations = create_next_generation(current_generations, n, mutation_probability, points)
+end
