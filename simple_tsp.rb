@@ -53,6 +53,12 @@ def create_next_generation(current_generations, n, mutation_probability, points)
   denominator = calc_denominator(current_generations)
   crossing_genes_array = choose_crossing_genes(current_generations[0][:gene].size)
 
+  #picking elites
+  current_generations.sort_by! { |current_generation| current_generation[:solution] }
+  elite = current_generations.take(20)
+  next_generations.concat(elite)
+  current_generations.shift(20)
+
   current_generations.each do |current_generation|
     roulette_probability_scaled = current_generation[:solution] / denominator.to_f * 10000
     mutation_probability_scaled = mutation_probability * 10000
@@ -101,6 +107,7 @@ end
 def calc_denominator(current_generations)
   denominator = 0
   current_generations.each do |current_generation|
+    puts current_generation
     denominator += current_generation[:solution]
   end
   denominator
@@ -109,7 +116,8 @@ end
 set_points(points)
 route = generate_route_array(points)
 current_generations = create_first_generation(points, n)
-10000.times do |i|
-  puts current_generations
+3.times do |i|
   current_generations = create_next_generation(current_generations, n, mutation_probability, points)
 end
+
+puts "Answer is #{current_generations[0][:solution]}"
